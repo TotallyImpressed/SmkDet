@@ -80,7 +80,7 @@ void TIM2_Config(void) {
 	TIM_TimeBaseStructInit(&TIM_TimeBaseInitStructure);
 	
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInitStructure.TIM_Period = 0x018F;
+	TIM_TimeBaseInitStructure.TIM_Period = 0x400;
 	TIM_TimeBaseInitStructure.TIM_Prescaler = 1;
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
 	
@@ -93,6 +93,22 @@ void ADC_Config() {
 	
 }
 
+void USART1_Config(void) {
+	USART_InitTypeDef USART1_InitStructure;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);
+	USART_StructInit(&USART1_InitStructure);
+	
+	USART1_InitStructure.USART_BaudRate = 9600;
+	USART1_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART1_InitStructure.USART_Mode = USART_Mode_Rx;
+	USART1_InitStructure.USART_Parity = USART_Parity_No;
+	USART1_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART1_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_Init(USART1, &USART1_InitStructure);
+	
+	USART_Cmd(USART1, ENABLE);
+}
+
 void NVIC_Config(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -102,6 +118,6 @@ void NVIC_Config(void) {
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	
 	
-//	NVIC_EnableIRQ(TIM2_IRQn);
+  NVIC_EnableIRQ(TIM2_IRQn);
 	NVIC_Init(&NVIC_InitStructure);
 }
