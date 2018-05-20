@@ -14,6 +14,8 @@ void RCC_Config(void) {
 		RCC_PLLCmd(ENABLE);
 	}
 	//RCC_PCLK2Config(RCC_HCLK_Div16);
+	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 }
 
 void GPIO_Config(void) {
@@ -30,6 +32,9 @@ void GPIO_Config(void) {
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	RCC_MCOConfig(RCC_MCO_PLLCLK_Div2);
 	
+	//---------------------------------------------
+  // Configuring for SYNCbar for external DAC
+  //---------------------------------------------	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -45,6 +50,19 @@ void GPIO_Config(void) {
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;            //MOSI
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
+	//---------------------------------------------
+  // Configuring for ADC
+  //---------------------------------------------	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
@@ -80,7 +98,7 @@ void TIM2_Config(void) {
 	TIM_TimeBaseStructInit(&TIM_TimeBaseInitStructure);
 	
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInitStructure.TIM_Period = 0x400;
+	TIM_TimeBaseInitStructure.TIM_Period = 0x18F;
 	TIM_TimeBaseInitStructure.TIM_Prescaler = 1;
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
 	
@@ -88,9 +106,25 @@ void TIM2_Config(void) {
 	TIM_ITConfig(TIM2, TIM_DIER_UIE, ENABLE);
 }
 
-void ADC_Config() {
+void ADC_Config(void) {
+	ADC_InitTypeDef ADC_InitStructure;
+	ADC_StructInit(&ADC_InitStructure);
 	
+	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+	ADC_InitStructure.ADC_NbrOfChannel = 2;
+	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+	ADC_Init(ADC1, &ADC_InitStructure);
 	
+	ADC_InjectedSequencerLengthConfig(ADC1,2);
+	ADC_InjectedChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_71Cycles5);
+	ADC_InjectedChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_71Cycles5);
+	ADC_ExternalTrigInjectedConvConfig( ADC1, ADC_ExternalTrigInjecConv_None );
+	
+	ADC_ITConfig(ADC1, ADC_IT_JEOC, ENABLE);
+	ADC_Cmd(ADC1, ENABLE);
 }
 
 void USART1_Config(void) {
@@ -110,14 +144,23 @@ void USART1_Config(void) {
 }
 
 void NVIC_Config(void) {
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	
 	
   NVIC_EnableIRQ(TIM2_IRQn);
+	NVIC_Init(&NVIC_InitStructure);
+	
+	NVIC_InitStructure.NVIC_IRQChannel = ADC1_2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	
+	
+  NVIC_EnableIRQ(ADC1_2_IRQn);
 	NVIC_Init(&NVIC_InitStructure);
 }
