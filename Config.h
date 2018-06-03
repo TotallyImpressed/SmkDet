@@ -9,5 +9,6 @@ void SPI_Config(void);
 void TIM2_Config(void);
 void NVIC_Config(void);
 void ADC_Config(void);
+void USART1_Config(void);
 
 #endif

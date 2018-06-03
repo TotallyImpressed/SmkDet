@@ -10,12 +10,13 @@ void RCC_Config(void) {
 	HSEStartUpStatus = RCC_WaitForHSEStartUp();
 		
 	if (HSEStartUpStatus == SUCCESS) {
-		RCC_PLLConfig(RCC_PLLSource_HSE_Div2,RCC_PLLMul_4);
+		RCC_PLLConfig(RCC_PLLSource_HSE_Div2,RCC_PLLMul_6);
 		RCC_PLLCmd(ENABLE);
 	}
-	//RCC_PCLK2Config(RCC_HCLK_Div16);
+	RCC_PCLK1Config(RCC_HCLK_Div1);
+	RCC_PCLK2Config(RCC_HCLK_Div4);
+	RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
 	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 }
 
 void GPIO_Config(void) {
@@ -65,6 +66,14 @@ void GPIO_Config(void) {
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
+	//---------------------------------------------
+  // Configuring for USART1
+  //---------------------------------------------	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
 void SPI_Config(void) {
@@ -98,7 +107,7 @@ void TIM2_Config(void) {
 	TIM_TimeBaseStructInit(&TIM_TimeBaseInitStructure);
 	
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInitStructure.TIM_Period = 0x18F;
+	TIM_TimeBaseInitStructure.TIM_Period = 0x18F-1;
 	TIM_TimeBaseInitStructure.TIM_Prescaler = 1;
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
 	
@@ -107,6 +116,8 @@ void TIM2_Config(void) {
 }
 
 void ADC_Config(void) {
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+	
 	ADC_InitTypeDef ADC_InitStructure;
 	ADC_StructInit(&ADC_InitStructure);
 	
@@ -125,6 +136,8 @@ void ADC_Config(void) {
 	
 	ADC_ITConfig(ADC1, ADC_IT_JEOC, ENABLE);
 	ADC_Cmd(ADC1, ENABLE);
+	ADC_AutoInjectedConvCmd( ADC1, ENABLE );
+	ADC_SoftwareStartInjectedConvCmd ( ADC1 , ENABLE ) ;
 }
 
 void USART1_Config(void) {
@@ -132,9 +145,9 @@ void USART1_Config(void) {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);
 	USART_StructInit(&USART1_InitStructure);
 	
-	USART1_InitStructure.USART_BaudRate = 9600;
+	USART1_InitStructure.USART_BaudRate = 115200;
 	USART1_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART1_InitStructure.USART_Mode = USART_Mode_Rx;
+	USART1_InitStructure.USART_Mode = USART_Mode_Tx;
 	USART1_InitStructure.USART_Parity = USART_Parity_No;
 	USART1_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART1_InitStructure.USART_WordLength = USART_WordLength_8b;

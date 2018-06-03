@@ -125,7 +125,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=326,139,776,696,0)(1007=167,137,354,412,0)(1008=-1,-1,-1,-1,0)(1009=-1,-1,-1,-1,0)</Name>
+          <Name>(1010=326,139,776,696,0)(1007=167,137,354,412,0)(1008=1456,121,1832,357,0)(1009=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -157,11 +157,6 @@
         </Ww>
         <Ww>
           <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>data_max,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>ilum_data</ItemText>
         </Ww>
@@ -227,12 +222,20 @@
           <WinId>35903</WinId>
         </Entry>
         <Entry>
+          <Name>System Viewer\RCC</Name>
+          <WinId>35899</WinId>
+        </Entry>
+        <Entry>
           <Name>System Viewer\SPI1</Name>
           <WinId>35905</WinId>
         </Entry>
         <Entry>
           <Name>System Viewer\TIM2</Name>
           <WinId>35902</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\USART1</Name>
+          <WinId>35900</WinId>
         </Entry>
       </SystemViewers>
       <DebugDescription>
